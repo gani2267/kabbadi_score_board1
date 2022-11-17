@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:kabbadi_score_board/styles.dart';
 import 'package:kabbadi_score_board/utils/history_element.dart';
 import 'package:provider/provider.dart';
 
@@ -38,11 +39,11 @@ class HistoryItem extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text(teamName+" : "),
-            Text(msg),
+            Text(teamName+" : ",style: newsPulseStyle,),
+            Text(msg,style: subtitle18,),
           ],
         ),
-        Text("${teamAscore}:${teamBscore}")
+        Text("${teamAscore}:${teamBscore}",style: newsPulseStyle,)
       ],
     );
   }
