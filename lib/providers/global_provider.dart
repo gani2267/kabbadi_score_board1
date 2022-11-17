@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:kabbadi_score_board/utils/history_element.dart';
+
 
 class global_provider with ChangeNotifier{
   int _scoreA = 0;
@@ -90,6 +92,23 @@ class global_provider with ChangeNotifier{
   }
 
 
+  List<HistoryElement> _historylist = [];
 
+  List get historylist => _historylist;
+
+  void addHistoryEle(String teamName,String msg){
+    HistoryElement ele = new HistoryElement(teamName, msg, _scoreA, _scoreB,_players_in_A,_players_in_B);
+    _historylist.add(ele);
+    notifyListeners();
+  }
+
+  void undoHistoryEle(){
+    _historylist.removeLast();
+    HistoryElement temp = _historylist.last;
+    _scoreA = temp.teamAscore;
+    _scoreB = temp.teamBscore;
+    _players_in_A = temp.teamAplayerNo;
+    _players_in_B = temp.teamBplayerNo;
+  }
 
 }
