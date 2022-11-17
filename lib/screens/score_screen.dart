@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:kabbadi_score_board/providers/scoreA_provider.dart';
+
 import 'package:kabbadi_score_board/providers/timer_provider.dart';
 import 'package:kabbadi_score_board/widgets/customPlayer.dart';
 import 'package:provider/provider.dart';
@@ -9,7 +9,7 @@ import 'package:stream_duration/stream_duration.dart';
 import 'package:riverpod/riverpod.dart';
 
 import '../components/compo.dart';
-import '../providers/scoreB_provider.dart';
+import '../providers/global_provider.dart';
 import '../styles.dart';
 
 class ScoreScreen extends StatefulWidget {
@@ -35,27 +35,28 @@ class _ScoreScreenState extends State<ScoreScreen> {
     Size _size = MediaQuery.of(context).size;
     double _btnWidth = (_size.width-60)/2;
 
-    int _spinnerA = context.read<SpinnerA>().value;
-    int _spinnerB = context.read<SpinnerB>().value;
+    int _spinnerA = context.read<global_provider>().spinnervalueA;
+    int _spinnerB = context.read<global_provider>().spinnervalueB;
     bool _isTimerPause = false;
 
-    int _playerTeamB = context.read<teamB>().playerNo;
-    int _playerTeamA = context.read<teamA>().playerNo;
+    int _playerTeamB = context.read<global_provider>().playerinB;
+    int _playerTeamA = context.read<global_provider>().playerinA;
+    return Consumer<global_provider>(
+        builder: (BuildContext context, gp, Widget? child) {
     return SingleChildScrollView(
       child: Column(
         children: [
-          Consumer<TimeStrings>(
-            builder: (BuildContext context, value, Widget? child) {
-              return Row(
+
+               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   kbButton(width: 100, title:
-                        value.startbtn, onTap: () =>
+                        "START", onTap: () =>
                         {
-                          _isTimerPause = !_isTimerPause,
-                          value.changeValue(_isTimerPause),
-                          value.timer(!_isTimerPause),
-                          _streamDuration.pause(),
+                          // _isTimerPause = !_isTimerPause,
+                          // gp.changeValue(_isTimerPause),
+                          // gp.timer(!_isTimerPause),
+                          // _streamDuration.pause(),
                         }, btnColor: Colors.blue),
                   SizedBox(
                     width: 8,
@@ -91,9 +92,9 @@ class _ScoreScreenState extends State<ScoreScreen> {
                     context.watch<TimeStrings>().ResetTime(),
                   }, btnColor: Colors.blue),
                 ],
-              );
-            }
-          ),
+              ),
+
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -107,27 +108,33 @@ class _ScoreScreenState extends State<ScoreScreen> {
                     child: Text('Team A',style: headline5WhiteBold,),
                   ),
                   Container(
-                    child: giveHeadAsNo(no_of_players: _playerTeamA),
+                    child: giveHeadAsNo(no_of_players: gp.playerinA),
                   ),
                   SizedBoxBtwBtns(),
-                  Text('${context.watch<ScoreACounter>().scoreA}',style: headline1,),
+                  Text('${gp.scoreA}',style: headline1,),
                   SizedBoxBtwBtns(),
-                  kbButton(width: _btnWidth, title: "BONUS LINE", onTap: ()=>{context.read<ScoreACounter>().increment(1)}),
+                  kbButton(width: _btnWidth, title: "BONUS LINE", onTap: ()=>{gp.incrementA(1)}),
                   SizedBoxBtwBtns(),
-                  kbButton(width: _btnWidth, title: "EMPTY RAID", onTap: ()=>{context.read<ScoreACounter>().increment(0)}),
+                  kbButton(width: _btnWidth, title: "EMPTY RAID", onTap: ()=>{gp.incrementA(0)}),
                   SizedBoxBtwBtns(),
                   kbButton(width: _btnWidth, title: "RAID:+1", onTap: ()=>{
-                    context.read<ScoreACounter>().increment(1),
-                    context.watch<teamB>().decrement(1)
+                    gp.incrementA(1),
+                    gp.incrementplayerA(1)
                     }
                   ),
                   SizedBoxBtwBtns(),
-                  kbButton(width: _btnWidth, title: "RAID:+2", onTap: ()=>{context.read<ScoreACounter>().increment(2)}),
+                  kbButton(width: _btnWidth, title: "RAID:+2", onTap: ()=>{
+                    gp.incrementA(2),
+                    gp.incrementplayerA(2)
+                  }),
                   SizedBoxBtwBtns(),
                   Row(
                     children: [
-                      kbButton(width: _btnWidth-50, title: "RAID:${context.watch<SpinnerA>().value}",
-                          onTap: ()=>{context.read<ScoreACounter>().increment(_spinnerA)}),
+                      kbButton(width: _btnWidth-50, title: "RAID:${gp.spinnervalueA}",
+                          onTap: ()=>{gp.givespinnerValueA(_spinnerA),
+                            gp.incrementA(_spinnerA),
+                            gp.incrementplayerA(_spinnerA)
+                      }),
                       DropdownButton(
                           dropdownColor: morpic,
                           borderRadius: BorderRadius.circular(10),
@@ -139,12 +146,22 @@ class _ScoreScreenState extends State<ScoreScreen> {
                             DropdownMenuItem(child: Text("+7"),value: 7),
                           ],
                           onChanged: (value) {
-                            context.read<SpinnerA>().giveValue(value!);
+                            gp.givespinnerValueA(value!);
+                            _spinnerA=value!;
+                            //context.read<SpinnerA>().giveValue(value!);
                           }),
                     ],
                   ),
                   SizedBoxBtwBtns(),
-                  kbButton(width: _btnWidth, title: "DEFEND", btnColor: morpic, onTap: ()=>{context.read<ScoreACounter>().increment(1)}),
+                  kbButton(width: _btnWidth, title: "DEFEND", btnColor: morpic, onTap: ()=>{
+                    if(gp.playerinA <=3){
+                      gp.incrementA(2),
+                      gp.incrementplayerA(1)
+                    }else{
+                      gp.incrementA(1),
+                      gp.incrementplayerA(1)
+                    }
+                  }),
                   SizedBoxBtwBtns(),
                 ],
               ),
@@ -161,23 +178,30 @@ class _ScoreScreenState extends State<ScoreScreen> {
                     child: Text('Team B',style: headline5WhiteBold,),
                   ),
                   Container(
-                    child: giveHeadAsNo(no_of_players: _playerTeamB),
+                    child: giveHeadAsNo(no_of_players: gp.playerinB),
                   ),
                   SizedBoxBtwBtns(),
-                  Text('${context.watch<ScoreBCounter>().scoreB}',style: headline1,),
+                  Text('${gp.scoreB}',style: headline1,),
                   SizedBoxBtwBtns(),
-                  kbButton(width: _btnWidth, title: "BONUS LINE", onTap: ()=>{context.read<ScoreBCounter>().increment(1)}),
+                  kbButton(width: _btnWidth, title: "BONUS LINE", onTap: ()=>{gp.incrementB(1)}),
                   SizedBoxBtwBtns(),
-                  kbButton(width: _btnWidth, title: "EMPTY RAID", onTap: ()=>{context.read<ScoreBCounter>().increment(0)}),
+                  kbButton(width: _btnWidth, title: "EMPTY RAID", onTap: ()=>{gp.incrementB(0)}),
                   SizedBoxBtwBtns(),
-                  kbButton(width: _btnWidth, title: "RAID:+1", onTap: ()=>{context.read<ScoreBCounter>().increment(1)}),
+                  kbButton(width: _btnWidth, title: "RAID:+1", onTap: ()=>{gp.incrementB(1),
+                    gp.incrementplayerB(1)
+                  }),
                   SizedBoxBtwBtns(),
-                  kbButton(width: _btnWidth, title: "RAID:+2", onTap: ()=>{context.read<ScoreBCounter>().increment(2)}),
+                  kbButton(width: _btnWidth, title: "RAID:+2", onTap: ()=>{gp.incrementplayerB(2),
+                  gp.incrementB(2)}),
                   SizedBoxBtwBtns(),
                   Row(
                     children: [
-                      kbButton(width: _btnWidth-50, title: "RAID:${context.watch<SpinnerB>().value}",
-                          onTap: ()=>{context.read<ScoreBCounter>().increment(_spinnerB)}),
+                      kbButton(width: _btnWidth-50, title: "RAID:${gp.spinnervalueB}",
+                          onTap: ()=>{
+                        gp.givespinnerValueB(_spinnerB),
+                            gp.incrementB(gp.spinnervalueB),
+                            gp.incrementplayerB(gp.spinnervalueB)
+                      }),
                       DropdownButton(
                           dropdownColor: morpic,
                           borderRadius: BorderRadius.circular(10),
@@ -189,12 +213,25 @@ class _ScoreScreenState extends State<ScoreScreen> {
                             DropdownMenuItem(child: Text("+7"),value: 7),
                           ],
                           onChanged: (value) {
-                            context.read<SpinnerB>().giveValue(value!);
+                           gp.givespinnerValueB(value!);
+                           _spinnerB = value!;
+                            // context.read<SpinnerB>().giveValue(value!);
                           }),
                     ],
                   ),
                   SizedBoxBtwBtns(),
-                  kbButton(width: _btnWidth, title: "DEFEND", btnColor: morpic, onTap: ()=>{context.read<ScoreBCounter>().increment(1)}),
+                  kbButton(width: _btnWidth, title: "DEFEND", btnColor: morpic, onTap: ()=>{
+                    if(gp.playerinB<=3){
+                      gp.incrementA(2),
+                      gp.incrementplayerB(1)
+
+                    }else{
+                      gp.incrementplayerB(1),
+                      gp.incrementB(1)
+
+                    }
+
+                  }),
                   SizedBoxBtwBtns(),
                 ],
               ),
@@ -208,6 +245,9 @@ class _ScoreScreenState extends State<ScoreScreen> {
           ),
         ],
       ),
+
+    );
+        }
     );
   }
 

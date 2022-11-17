@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kabbadi_score_board/providers/scoreA_provider.dart';
-import 'package:kabbadi_score_board/providers/scoreB_provider.dart';
+import 'package:kabbadi_score_board/providers/global_provider.dart';
 import 'package:kabbadi_score_board/providers/timer_provider.dart';
 import 'package:kabbadi_score_board/screens/home_screen.dart';
 import 'package:kabbadi_score_board/styles.dart';
@@ -13,12 +12,7 @@ void main() {
   runApp(
       MultiProvider(
     providers: [
-      ChangeNotifierProvider(create: (_) => ScoreACounter()),
-      ChangeNotifierProvider(create: (_) => SpinnerA()),
-      ChangeNotifierProvider(create: (_) => ScoreBCounter()),
-      ChangeNotifierProvider(create: (_) => teamB()),
-      ChangeNotifierProvider(create: (_) => teamA()),
-      ChangeNotifierProvider(create: (_) => SpinnerB()),
+      ChangeNotifierProvider(create: (_) => global_provider()),
       ChangeNotifierProvider(create: (_) => TimeStrings()),
     ],
     child: MyApp(),
