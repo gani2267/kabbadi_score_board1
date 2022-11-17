@@ -89,7 +89,7 @@ class _ScoreScreenState extends State<ScoreScreen> {
                   ),
                   kbButton(width: 100, title: "RESET", onTap: () =>
                   {
-                    context.watch<TimeStrings>().ResetTime(),
+                    // context.watch<TimeStrings>().ResetTime(),
                   }, btnColor: Colors.blue),
                 ],
               ),
@@ -104,8 +104,10 @@ class _ScoreScreenState extends State<ScoreScreen> {
                     style: TextButton.styleFrom(
                       primary: Colors.blue,
                     ),
-                    onPressed: () { },
-                    child: Text('Team A',style: headline5WhiteBold,),
+                    onPressed: () {
+                      showDialog(context: context, builder: (BuildContext context) => changeTeamNameDialog);
+                    },
+                    child: Text(gp.teamAname,style: headline5WhiteBold,),
                   ),
                   Container(
                     child: giveHeadAsNo(no_of_players: gp.playerinA),
@@ -119,7 +121,8 @@ class _ScoreScreenState extends State<ScoreScreen> {
                   SizedBoxBtwBtns(),
                   kbButton(width: _btnWidth, title: "RAID:+1", onTap: ()=>{
                     gp.incrementA(1),
-                    gp.incrementplayerA(1)
+                    gp.incrementplayerA(1),
+                    gp.addHistoryEle(gp.teamAname, 'Raid:+1')
                     }
                   ),
                   SizedBoxBtwBtns(),
@@ -174,8 +177,10 @@ class _ScoreScreenState extends State<ScoreScreen> {
                     style: TextButton.styleFrom(
                       primary: Colors.blue,
                     ),
-                    onPressed: () { },
-                    child: Text('Team B',style: headline5WhiteBold,),
+                    onPressed: () {
+                      showDialog(context: context, builder: (BuildContext context) => changeTeamNameDialog);
+                    },
+                    child: Text(gp.teamBname,style: headline5WhiteBold,),
                   ),
                   Container(
                     child: giveHeadAsNo(no_of_players: gp.playerinB),
@@ -238,7 +243,9 @@ class _ScoreScreenState extends State<ScoreScreen> {
             ],
           ),
           CupertinoButton.filled(
-            onPressed: () {},
+            onPressed: () {
+              gp.undoHistoryEle();
+            },
             child: Text(
               "UNDO",
             ),
@@ -251,7 +258,45 @@ class _ScoreScreenState extends State<ScoreScreen> {
     );
   }
 
-  abc() {
-    print("adfa");
-  }
+  Dialog changeTeamNameDialog= Dialog(
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)), //this right here
+    backgroundColor: Colors.white,
+    child: Container(
+      height: 300.0,
+      width: 300.0,
+
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Padding(
+            padding:  EdgeInsets.fromLTRB(10, 15, 10, 0),
+            child: Text('TEAM A :', style: TextStyle(color: Colors.red),),
+          ),
+          Padding(
+            padding:  EdgeInsets.fromLTRB(10, 15, 10, 0),
+            child: TextFormField(
+            ),
+          ),
+          Padding(
+            padding:  EdgeInsets.fromLTRB(10, 15, 10, 0),
+            child: Text('TEAM B :', style: TextStyle(color: Colors.red),),
+          ),
+          // Padding(
+          //   padding: EdgeInsets.all(15.0),
+          //   child: Text('Awesome', style: TextStyle(color: Colors.red),),
+          // ),
+          // Padding(padding: EdgeInsets.only(top: 50.0)),
+          TextButton(onPressed: () {
+
+          },
+              child: CupertinoButton.filled(
+                onPressed: () {},
+                child: Text(
+                  "SAVE",
+                ),
+              ),)
+        ],
+      ),
+    ),
+      );
 }

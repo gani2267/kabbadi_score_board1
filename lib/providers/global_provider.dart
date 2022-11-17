@@ -104,11 +104,33 @@ class global_provider with ChangeNotifier{
 
   void undoHistoryEle(){
     _historylist.removeLast();
-    HistoryElement temp = _historylist.last;
-    _scoreA = temp.teamAscore;
-    _scoreB = temp.teamBscore;
-    _players_in_A = temp.teamAplayerNo;
-    _players_in_B = temp.teamBplayerNo;
+    if(_historylist.isNotEmpty) {
+      HistoryElement temp = _historylist.last;
+      _scoreA = temp.teamAscore;
+      _scoreB = temp.teamBscore;
+      _players_in_A = temp.teamAplayerNo;
+      _players_in_B = temp.teamBplayerNo;
+    }else{
+      _scoreA = 0;
+      _scoreB = 0;
+      _players_in_A = 7;
+      _players_in_B = 7;
+    }
+    notifyListeners();
+  }
+
+  String _teamAName = 'Brajesh';
+  String _teamBName = 'Patil';
+
+  String get teamAname => _teamAName;
+  String get teamBname => _teamBName;
+
+  void changeTeamAName(String name){
+    _teamAName = name;
+  }
+
+  void changeTeamBName(String name){
+    _teamBName = name;
   }
 
 }
