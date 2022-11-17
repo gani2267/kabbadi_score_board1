@@ -34,7 +34,7 @@ class giveHeadAsNo extends StatelessWidget {
       margin: EdgeInsets.symmetric(horizontal: 6),
       height: 8,
       width: 8,
-      child: Icon(Icons.person),
+      child: Icon(Icons.person,color: Colors.green,),
     );
   }
 }
