@@ -188,16 +188,25 @@ class _ScoreScreenState extends State<ScoreScreen> {
                   SizedBoxBtwBtns(),
                   Text('${gp.scoreB}',style: headline1,),
                   SizedBoxBtwBtns(),
-                  kbButton(width: _btnWidth, title: "BONUS LINE", onTap: ()=>{gp.incrementB(1)}),
+                  kbButton(width: _btnWidth, title: "BONUS LINE", onTap: ()=>{gp.incrementB(1),
+                    gp.addHistoryEle(gp.teamBname, 'BonusLine: +1')
+                  }),
                   SizedBoxBtwBtns(),
-                  kbButton(width: _btnWidth, title: "EMPTY RAID", onTap: ()=>{gp.incrementB(0)}),
+                  kbButton(width: _btnWidth, title: "EMPTY RAID", onTap: ()=>{gp.incrementB(0),
+                    gp.addHistoryEle(gp.teamBname, 'Empty Raid: +0')
+                  }),
                   SizedBoxBtwBtns(),
                   kbButton(width: _btnWidth, title: "RAID:+1", onTap: ()=>{gp.incrementB(1),
-                    gp.incrementplayerB(1)
+                    gp.incrementplayerB(1),
+                    gp.addHistoryEle(gp.teamBname, 'Raid: +1')
                   }),
                   SizedBoxBtwBtns(),
                   kbButton(width: _btnWidth, title: "RAID:+2", onTap: ()=>{gp.incrementplayerB(2),
-                  gp.incrementB(2)}),
+
+                  gp.incrementB(2),
+                    gp.addHistoryEle(gp.teamBname, 'Raid: +2')
+
+                  }),
                   SizedBoxBtwBtns(),
                   Row(
                     children: [
@@ -205,7 +214,8 @@ class _ScoreScreenState extends State<ScoreScreen> {
                           onTap: ()=>{
                         gp.givespinnerValueB(_spinnerB),
                             gp.incrementB(gp.spinnervalueB),
-                            gp.incrementplayerB(gp.spinnervalueB)
+                            gp.incrementplayerB(gp.spinnervalueB),
+                            gp.addHistoryEle(gp.teamBname, 'Raid: +${gp.spinnervalueB}')
                       }),
                       DropdownButton(
                           dropdownColor: morpic,
@@ -228,11 +238,13 @@ class _ScoreScreenState extends State<ScoreScreen> {
                   kbButton(width: _btnWidth, title: "DEFEND", btnColor: morpic, onTap: ()=>{
                     if(gp.playerinB<=3){
                       gp.incrementA(2),
-                      gp.incrementplayerB(1)
+                      gp.incrementplayerB(1),
+                      gp.addHistoryEle(gp.teamBname, 'Super Tackel: +2')
 
                     }else{
                       gp.incrementplayerB(1),
-                      gp.incrementB(1)
+                      gp.incrementB(1),
+                      gp.addHistoryEle(gp.teamBname, 'Tackel: +1')
 
                     }
 
