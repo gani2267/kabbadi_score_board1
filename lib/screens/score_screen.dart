@@ -138,6 +138,7 @@ class _ScoreScreenState extends State<ScoreScreen> {
                   SizedBoxBtwBtns(),
                   kbButton(width: _btnWidth, title: "BONUS LINE", onTap: ()=>{
                     gp.incrementA(1),
+                    _percentEmptyRaidA = 0,
                     gp.addHistoryEle(gp.teamAname, 'BonusLine: +1')
                   }),
                   SizedBoxBtwBtns(),
@@ -159,9 +160,20 @@ class _ScoreScreenState extends State<ScoreScreen> {
                       gp.incrementA(0);
                       gp.addHistoryEle(gp.teamAname, 'Empty Raid: +0');
                       _percentEmptyRaidA += (1/3);
-                      Timer(Duration(seconds: 1), () {
+                      Timer(Duration(seconds: 0), () {
                         if(_percentEmptyRaidA == 1){
+                          gp.undoHistoryEle();
+
                           _percentEmptyRaidA = 0;
+
+                          if(gp.playerinB <=3){
+                            gp.incrementA(2);
+                          }else{
+                            gp.incrementB(1);
+                          }
+                          gp.incrementplayerB(1);
+                          gp.addHistoryEle(gp.teamAname, 'Raider out Do or Die raid');
+
                         }
                       });
                     },
@@ -174,13 +186,15 @@ class _ScoreScreenState extends State<ScoreScreen> {
                   kbButton(width: _btnWidth, title: "RAID:+1", onTap: ()=>{
                     gp.incrementA(1),
                     gp.incrementplayerA(1),
-                    gp.addHistoryEle(gp.teamAname, 'Raid:+1')
+                    gp.addHistoryEle(gp.teamAname, 'Raid:+1'),
+                  _percentEmptyRaidA = 0
                     }
                   ),
                   SizedBoxBtwBtns(),
                   kbButton(width: _btnWidth, title: "RAID:+2", onTap: ()=>{
                     gp.incrementA(2),
                     gp.incrementplayerA(2),
+                    _percentEmptyRaidA = 0,
                     gp.addHistoryEle(gp.teamAname, 'Raid: +2')
                   }),
                   SizedBoxBtwBtns(),
@@ -190,6 +204,7 @@ class _ScoreScreenState extends State<ScoreScreen> {
                           onTap: ()=>{gp.givespinnerValueA(_spinnerA),
                             gp.incrementA(_spinnerA),
                             gp.incrementplayerA(_spinnerA),
+                            _percentEmptyRaidA = 0,
                             gp.addHistoryEle(gp.teamAname, 'Raid: +${_spinnerA}')
                       }),
                       DropdownButton(
@@ -203,23 +218,28 @@ class _ScoreScreenState extends State<ScoreScreen> {
                             DropdownMenuItem(child: Text("+7"),value: 7),
                           ],
                           onChanged: (value) {
+
                             gp.givespinnerValueA(value!);
                             _spinnerA=value!;
+
                             //context.read<SpinnerA>().giveValue(value!);
                           }),
                     ],
                   ),
                   SizedBoxBtwBtns(),
                   kbButton(width: _btnWidth, title: "DEFEND", btnColor: morpic, onTap: ()=>{
+                  _percentEmptyRaidB = 0,
                     if(gp.playerinA <=3){
                       gp.incrementA(2),
                       gp.incrementplayerA(1),
                       gp.addHistoryEle(gp.teamAname, 'Super Tackel: +2')
-                    }else{
-                      gp.incrementA(1),
-                      gp.incrementplayerA(1),
-                      gp.addHistoryEle(gp.teamAname, 'Tackel: +1')
-                    }
+                    }else
+                      {
+                        gp.incrementA(1),
+                        gp.incrementplayerA(1),
+                        gp.addHistoryEle(gp.teamAname, 'Tackel: +1')
+                      }
+
                   }),
                   SizedBoxBtwBtns(),
                 ],
@@ -247,6 +267,7 @@ class _ScoreScreenState extends State<ScoreScreen> {
                   Text('${gp.scoreB}',style: headline1,),
                   SizedBoxBtwBtns(),
                   kbButton(width: _btnWidth, title: "BONUS LINE", onTap: ()=>{gp.incrementB(1),
+                  _percentEmptyRaidB = 0,
                     gp.addHistoryEle(gp.teamBname, 'BonusLine: +1')
                   }),
                   SizedBoxBtwBtns(),
@@ -268,10 +289,20 @@ class _ScoreScreenState extends State<ScoreScreen> {
                       gp.incrementB(0);
                       gp.addHistoryEle(gp.teamBname, 'Empty Raid: +0');
                       _percentEmptyRaidB += (1/3);
-                      Timer(Duration(seconds: 1), () {
+                      Timer(Duration(seconds: 0), () {
                         if(_percentEmptyRaidB == 1){
+                          gp.undoHistoryEle();
                           _percentEmptyRaidB = 0;
+                          if(gp.playerinA <=3){
+                            gp.incrementA(2);
+                          }else{
+                            gp.incrementA(1);
+                          }
+                          gp.incrementplayerA(1);
+                          gp.addHistoryEle(gp.teamBname, 'Raider out Do or Die raid');
+
                         }
+
                       });
                     },
                   ),
@@ -282,12 +313,14 @@ class _ScoreScreenState extends State<ScoreScreen> {
                   SizedBoxBtwBtns(),
                   kbButton(width: _btnWidth, title: "RAID:+1", onTap: ()=>{gp.incrementB(1),
                     gp.incrementplayerB(1),
+                    _percentEmptyRaidB= 0,
                     gp.addHistoryEle(gp.teamBname, 'Raid: +1')
                   }),
                   SizedBoxBtwBtns(),
                   kbButton(width: _btnWidth, title: "RAID:+2", onTap: ()=>{gp.incrementplayerB(2),
 
                   gp.incrementB(2),
+                  _percentEmptyRaidB = 0,
                     gp.addHistoryEle(gp.teamBname, 'Raid: +2')
 
                   }),
@@ -299,6 +332,7 @@ class _ScoreScreenState extends State<ScoreScreen> {
                         gp.givespinnerValueB(_spinnerB),
                             gp.incrementB(gp.spinnervalueB),
                             gp.incrementplayerB(gp.spinnervalueB),
+                              _percentEmptyRaidB = 0,
                             gp.addHistoryEle(gp.teamBname, 'Raid: +${gp.spinnervalueB}')
                       }),
                       DropdownButton(
@@ -320,12 +354,16 @@ class _ScoreScreenState extends State<ScoreScreen> {
                   ),
                   SizedBoxBtwBtns(),
                   kbButton(width: _btnWidth, title: "DEFEND", btnColor: morpic, onTap: ()=>{
+                    _percentEmptyRaidA = 0,
                     if(gp.playerinB<=3){
                       gp.incrementA(2),
+                      _percentEmptyRaidA = 0,
                       gp.incrementplayerB(1),
                       gp.addHistoryEle(gp.teamBname, 'Super Tackel: +2')
 
-                    }else{
+                    }
+
+                    else{
                       gp.incrementplayerB(1),
                       gp.incrementB(1),
                       gp.addHistoryEle(gp.teamBname, 'Tackel: +1')
