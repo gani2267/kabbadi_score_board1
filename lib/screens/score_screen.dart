@@ -1,10 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:kabbadi_score_board/providers/timer_provider.dart';
 import 'package:kabbadi_score_board/widgets/customPlayer.dart';
+import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:slide_countdown/slide_countdown.dart';
+import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:stream_duration/stream_duration.dart';
 import 'package:riverpod/riverpod.dart';
 
@@ -20,14 +24,22 @@ class ScoreScreen extends StatefulWidget {
 }
 
 class _ScoreScreenState extends State<ScoreScreen> {
+  late TextEditingController controller;
+  late TextEditingController controller_2;
   static StreamDuration _streamDuration= StreamDuration(
     const Duration(minutes: 40),
   );
 
+  final _stopWatchTimer = StopWatchTimer(
+    mode: StopWatchMode.countDown,
+    presetMillisecond: StopWatchTimer.getMilliSecFromMinute(40), // millisecond => minute.
+  );
+
   @override
   void initState() {
-
     super.initState();
+    controller= TextEditingController();
+    controller_2=TextEditingController();
   }
 
   @override
@@ -41,6 +53,8 @@ class _ScoreScreenState extends State<ScoreScreen> {
 
     int _playerTeamB = context.read<global_provider>().playerinB;
     int _playerTeamA = context.read<global_provider>().playerinA;
+    double _percentEmptyRaidA = 0;
+    double _percentEmptyRaidB = 0;
     return Consumer<global_provider>(
         builder: (BuildContext context, gp, Widget? child) {
     return SingleChildScrollView(
@@ -53,10 +67,11 @@ class _ScoreScreenState extends State<ScoreScreen> {
                   kbButton(width: 100, title:
                         "START", onTap: () =>
                         {
-                          // _isTimerPause = !_isTimerPause,
-                          // gp.changeValue(_isTimerPause),
-                          // gp.timer(!_isTimerPause),
-                          // _streamDuration.pause(),
+                          if(_stopWatchTimer.isRunning){
+                            _stopWatchTimer.onStopTimer()
+                          }else{
+                            _stopWatchTimer.onStartTimer()
+                          }
                         }, btnColor: Colors.blue),
                   SizedBox(
                     width: 8,
@@ -65,22 +80,26 @@ class _ScoreScreenState extends State<ScoreScreen> {
                     height: 40,
                     child: Row(
                       children: [
-                        SlideCountdownSeparated(duration:
-                        Duration(minutes: context.watch<TimeStrings>().min,
-                            seconds: context.watch<TimeStrings>().second),
-                        )
-                        // Icon(Icons.timer),
-                        // SizedBox(
-                        //   width: 2,
-                        // ),
-                        // Text(context
-                        //     .watch<TimeStrings>()
-                        //     .min
-                        //     .toString()+":"),
-                        // Text(context
-                        //     .watch<TimeStrings>()
-                        //     .second
-                        //     .toString()),
+                    StreamBuilder<int>(
+                    stream: _stopWatchTimer.rawTime,
+                      initialData: 0,
+                      builder: (context, snap) {
+                        final value = snap.data;
+                        final displayTime = StopWatchTimer.getDisplayTime(value!);
+                        String _displayTimeArrMid = displayTime.split('.').first;
+                        List<String> _displayTimeArr = _displayTimeArrMid.split(':');
+                        return Row(
+                          children: <Widget>[
+                            Icon(Icons.timer),
+                            SizedBox(
+                              width: 2,
+                            ),
+                            Text(_displayTimeArr[1]+":"),
+                            Text(_displayTimeArr[2])
+                          ],
+                        );
+                      },
+                    ),
                       ],
                     ),
                   ),
@@ -89,7 +108,7 @@ class _ScoreScreenState extends State<ScoreScreen> {
                   ),
                   kbButton(width: 100, title: "RESET", onTap: () =>
                   {
-                    // context.watch<TimeStrings>().ResetTime(),
+                    _stopWatchTimer.onResetTimer()
                   }, btnColor: Colors.blue),
                 ],
               ),
@@ -104,8 +123,10 @@ class _ScoreScreenState extends State<ScoreScreen> {
                     style: TextButton.styleFrom(
                       primary: Colors.blue,
                     ),
-                    onPressed: () {
-                      showDialog(context: context, builder: (BuildContext context) => changeTeamNameDialog);
+                    onPressed: () async {
+                      final TA= await openDialog();
+                      if(TA==null || TA.isEmpty) return;
+                      setState(() => gp.changeTeamAName(TA));
                     },
                     child: Text(gp.teamAname,style: headline5WhiteBold,),
                   ),
@@ -120,10 +141,35 @@ class _ScoreScreenState extends State<ScoreScreen> {
                     gp.addHistoryEle(gp.teamAname, 'BonusLine: +1')
                   }),
                   SizedBoxBtwBtns(),
-                  kbButton(width: _btnWidth, title: "EMPTY RAID", onTap: ()=>{
-                    gp.incrementA(0),
-                    gp.addHistoryEle(gp.teamAname, 'Empty Raid: +0')
-                  }),
+                  GestureDetector(
+                    child: new LinearPercentIndicator(
+                      width: _btnWidth,
+                      barRadius: Radius.circular(10),
+                      animation: true,
+                      animationDuration: 000,
+                      lineHeight: 40.0,
+                      percent: _percentEmptyRaidA,
+                      center: Text("EMPTY RAID",style: TextStyle(
+                        color: Colors.black
+                      ),),
+                      linearStrokeCap: LinearStrokeCap.butt,
+                      progressColor: Colors.red,
+                    ),
+                    onTap: () {
+                      gp.incrementA(0);
+                      gp.addHistoryEle(gp.teamAname, 'Empty Raid: +0');
+                      _percentEmptyRaidA += (1/3);
+                      Timer(Duration(seconds: 1), () {
+                        if(_percentEmptyRaidA == 1){
+                          _percentEmptyRaidA = 0;
+                        }
+                      });
+                    },
+                  ),
+                  // kbButton(width: _btnWidth, title: "EMPTY RAID", onTap: ()=>{
+                  //   gp.incrementA(0),
+                  //   gp.addHistoryEle(gp.teamAname, 'Empty Raid: +0')
+                  // }),
                   SizedBoxBtwBtns(),
                   kbButton(width: _btnWidth, title: "RAID:+1", onTap: ()=>{
                     gp.incrementA(1),
@@ -187,8 +233,10 @@ class _ScoreScreenState extends State<ScoreScreen> {
                     style: TextButton.styleFrom(
                       primary: Colors.blue,
                     ),
-                    onPressed: () {
-                      showDialog(context: context, builder: (BuildContext context) => changeTeamNameDialog);
+                    onPressed: () async {
+                      final TB= await OD();
+                      if(TB==null || TB.isEmpty) return;
+                      setState(() => gp.changeTeamBName(TB));
                     },
                     child: Text(gp.teamBname,style: headline5WhiteBold,),
                   ),
@@ -202,9 +250,35 @@ class _ScoreScreenState extends State<ScoreScreen> {
                     gp.addHistoryEle(gp.teamBname, 'BonusLine: +1')
                   }),
                   SizedBoxBtwBtns(),
-                  kbButton(width: _btnWidth, title: "EMPTY RAID", onTap: ()=>{gp.incrementB(0),
-                    gp.addHistoryEle(gp.teamBname, 'Empty Raid: +0')
-                  }),
+                  GestureDetector(
+                    child: new LinearPercentIndicator(
+                      width: _btnWidth,
+                      barRadius: Radius.circular(10),
+                      animation: true,
+                      animationDuration: 000,
+                      lineHeight: 40.0,
+                      percent: _percentEmptyRaidB,
+                      center: Text("EMPTY RAID",style: TextStyle(
+                          color: Colors.black
+                      ),),
+                      linearStrokeCap: LinearStrokeCap.butt,
+                      progressColor: Colors.red,
+                    ),
+                    onTap: () {
+                      gp.incrementB(0);
+                      gp.addHistoryEle(gp.teamBname, 'Empty Raid: +0');
+                      _percentEmptyRaidB += (1/3);
+                      Timer(Duration(seconds: 1), () {
+                        if(_percentEmptyRaidB == 1){
+                          _percentEmptyRaidB = 0;
+                        }
+                      });
+                    },
+                  ),
+                  // kbButton(width: _btnWidth, title: "EMPTY RAID", onTap: ()=>{
+                  //   gp.incrementB(0),
+                  //   gp.addHistoryEle(gp.teamBname, 'Empty Raid: +0')
+                  // }),
                   SizedBoxBtwBtns(),
                   kbButton(width: _btnWidth, title: "RAID:+1", onTap: ()=>{gp.incrementB(1),
                     gp.incrementplayerB(1),
@@ -321,4 +395,46 @@ class _ScoreScreenState extends State<ScoreScreen> {
       ),
     ),
       );
+
+  Future<String?> openDialog() => showDialog<String>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text('Your Team Name'),
+      content: TextField(
+        autofocus: true,
+        decoration: InputDecoration(hintText: 'Team A'),
+        controller: controller,
+      ),
+      actions: [
+        TextButton(onPressed: submit,
+          child: Text('SUBMIT'),
+        ),
+
+      ],
+    ),
+  );
+  Future<String?> OD() => showDialog<String>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text('Your Team Name'),
+      content: TextField(
+        autofocus: true,
+        decoration: InputDecoration(hintText: 'Team B'),
+        controller: controller_2,
+      ),
+      actions: [
+        TextButton(onPressed: sb,
+          child: Text('SUBMIT'),
+        ),
+
+      ],
+    ),
+  );
+  void sb(){
+    Navigator.of(context).pop(controller_2.text);
+  }
+  void submit(){
+    Navigator.of(context).pop(controller.text);
+
+  }
 }

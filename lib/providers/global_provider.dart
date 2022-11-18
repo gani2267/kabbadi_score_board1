@@ -119,8 +119,8 @@ class global_provider with ChangeNotifier{
     notifyListeners();
   }
 
-  String _teamAName = 'Brajesh';
-  String _teamBName = 'Patil';
+  String _teamAName = 'Team A';
+  String _teamBName = 'Team B';
 
   String get teamAname => _teamAName;
   String get teamBname => _teamBName;

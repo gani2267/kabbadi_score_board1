@@ -26,10 +26,30 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar:
+        // PreferredSize(
+      //   preferredSize: Size(double.maxFinite, 60),
+      //   child: Row(
+      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //     children: [
+      //       Text('Custom Match'),
+      //       Icon(Icons.picture_as_pdf)
+      //     ],
+      //   ),
+      //
+      // ),
+
+      AppBar(
         backgroundColor: Colors.black,
         elevation: 0,
         title: const Text("Custom Match"),
+        actions: [
+          IconButton(
+              onPressed: () {
+
+              },
+              icon: const Icon(Icons.picture_as_pdf))
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
